@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/models/device_model.dart';
 import '../providers/device_provider.dart';
+import '../../../../core/utils/user_facing_error.dart';
 
 /// Screen for adding a new device to the registry.
 class AddDeviceScreen extends ConsumerStatefulWidget {
@@ -71,7 +72,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(remediationMessageForError(e))),
         );
       }
     } finally {
@@ -109,6 +110,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Device Name *',
+                helperText: 'Use a descriptive name that is easy for screen readers.',
                 hintText: 'e.g. Living Room Lamp',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.devices),
