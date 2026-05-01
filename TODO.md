@@ -1,23 +1,23 @@
 # TODO — Prioritized Remediation & Improvement Plan
 
 ## P0 — Critical (Do first)
-- [ ] Remove plaintext credentials from Firestore `extraConfig`; migrate to secure storage and token references only.
-- [ ] Define and enforce strict Firestore Security Rules with least privilege and field-level constraints.
-- [ ] Add secret redaction policy for logs and exceptions (never log tokens/passwords/device secrets).
+- [x] Remove plaintext credentials from Firestore `extraConfig`; migrate to secure storage and token references only.
+- [x] Define and enforce strict Firestore Security Rules with least privilege and field-level constraints.
+- [x] Add secret redaction policy for logs and exceptions (never log tokens/passwords/device secrets).
 - [ ] Implement TLS pinning (or equivalent transport trust hardening) for cloud driver endpoints.
 
 ## P1 — High Priority
-- [ ] Fix `DriverManager.bindDevice()` to dispose previous bound driver before replacement.
-- [ ] Harden Kasa response parser to read length-prefixed payload safely with size limits.
-- [ ] Add robust input validation for IP/MAC and brand-specific required fields in Add Device UX.
-- [ ] Refactor `DeviceListScreen` sign-out to use injected Riverpod auth provider (testable DI).
-- [ ] Add auth/session timeout handling and explicit re-auth UX for cloud drivers.
+- [x] Fix `DriverManager.bindDevice()` to dispose previous bound driver before replacement.
+- [x] Harden Kasa response parser to read length-prefixed payload safely with size limits.
+- [x] Add robust input validation for IP/MAC and brand-specific required fields in Add Device UX.
+- [x] Refactor `DeviceListScreen` sign-out to use injected Riverpod auth provider (testable DI).
+- [x] Add auth/session timeout handling and explicit re-auth UX for cloud drivers.
 
 ## P2 — Reliability & Performance
-- [ ] Introduce retry/backoff with jitter and circuit breaker patterns for network calls.
-- [ ] Debounce/coalesce frequent control updates (brightness sliders) to reduce traffic and battery use.
+- [x] Introduce retry/backoff with jitter and circuit breaker patterns for network calls.
+- [x] Debounce/coalesce frequent control updates (brightness sliders) to reduce traffic and battery use.
 - [ ] Implement local cache/offline mode using Isar (already in dependencies).
-- [ ] Add lifecycle monitoring to ensure all sockets/HTTP clients are disposed on sign-out/app background.
+- [x] Add lifecycle monitoring to ensure all sockets/HTTP clients are disposed on sign-out/app background.
 
 ## P3 — UX, Accessibility, and Product Quality
 - [ ] Add contextual error states with actionable remediation guidance (instead of raw exception text).

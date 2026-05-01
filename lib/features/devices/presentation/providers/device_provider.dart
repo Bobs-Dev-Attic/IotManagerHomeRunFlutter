@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/drivers/driver_manager.dart';
@@ -54,6 +56,7 @@ class DeviceStateNotifier extends StateNotifier<DeviceModel> {
 
   final DriverManager _manager;
   final FirebaseDeviceRegistryService _registryService;
+  Timer? _brightnessDebounce;
 
   Future<void> toggle() async {
     final newValue = !state.isPoweredOn;
@@ -73,18 +76,25 @@ class DeviceStateNotifier extends StateNotifier<DeviceModel> {
   }
 
   Future<void> setBrightness(double brightness) async {
-    try {
-      await _manager.setBrightness(state.deviceId, brightness);
-      state = state.copyWith(brightness: brightness);
-      await _registryService.syncLiveState(
-        deviceId: state.deviceId,
-        isOnline: state.isOnline,
-        isPoweredOn: state.isPoweredOn,
-        brightness: brightness,
-      );
-    } catch (e) {
-      rethrow;
-    }
+    state = state.copyWith(brightness: brightness);
+    _brightnessDebounce?.cancel();
+    _brightnessDebounce = Timer(const Duration(milliseconds: 250), () async {
+      try {
+        await _manager.setBrightness(state.deviceId, brightness);
+        await _registryService.syncLiveState(
+          deviceId: state.deviceId,
+          isOnline: state.isOnline,
+          isPoweredOn: state.isPoweredOn,
+          brightness: brightness,
+        );
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void dispose() {
+    _brightnessDebounce?.cancel();
+    super.dispose();
   }
 
   Future<void> refreshStatus() async {
