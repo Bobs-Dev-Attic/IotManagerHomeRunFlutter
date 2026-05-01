@@ -23,6 +23,7 @@ class KasaDriver extends BaseDeviceDriver {
   static const int xorKey = 171; // 0xAB
 
   static const Duration _timeout = Duration(seconds: 5);
+  static const int _maxPayloadBytes = 64 * 1024;
 
   // Kasa command JSON payloads
   static const String _cmdGetSysInfo = '{"system":{"get_sysinfo":{}}}';
@@ -248,7 +249,23 @@ class KasaDriver extends BaseDeviceDriver {
             throw DriverCommandException('KasaDriver: response timeout'),
       );
 
-      final responseJson = decrypt(responseBytes);
+      if (responseBytes.length < 4) {
+        throw DriverCommandException('KasaDriver: invalid response header');
+      }
+      final expectedLength =
+          (responseBytes[0] << 24) |
+          (responseBytes[1] << 16) |
+          (responseBytes[2] << 8) |
+          responseBytes[3];
+      if (expectedLength < 0 || expectedLength > _maxPayloadBytes) {
+        throw DriverCommandException('KasaDriver: response payload too large');
+      }
+      if (responseBytes.length - 4 < expectedLength) {
+        throw DriverCommandException('KasaDriver: truncated response payload');
+      }
+
+      final payload = Uint8List.sublistView(responseBytes, 0, 4 + expectedLength);
+      final responseJson = decrypt(payload);
       try {
         return jsonDecode(responseJson) as Map<String, dynamic>;
       } catch (e) {

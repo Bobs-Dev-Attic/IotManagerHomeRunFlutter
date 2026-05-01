@@ -243,6 +243,10 @@ class CyncDriver extends BaseDeviceDriver {
       }
       return response.data as Map<String, dynamic>?;
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        _accessToken = null;
+        throw DriverCommandException('Session expired. Please re-authenticate.');
+      }
       throw DriverCommandException(
         'CyncDriver: API request failed for $path',
         cause: e,

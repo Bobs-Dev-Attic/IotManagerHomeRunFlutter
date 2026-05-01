@@ -60,6 +60,11 @@ class DriverManager {
     }
 
     // Each device gets its own dedicated driver instance.
+    final existing = _boundDrivers.remove(device.deviceId);
+    if (existing != null) {
+      await existing.dispose();
+    }
+
     final instance = _cloneDriver(prototype);
     await instance.initialize(device, device.extraConfig);
     _boundDrivers[device.deviceId] = instance;
