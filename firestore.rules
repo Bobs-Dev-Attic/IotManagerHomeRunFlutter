@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    match /users/{uid}/devices/{deviceId} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.userId == uid
+        && request.resource.data.displayName is string
+        && request.resource.data.brand is string
+        && request.resource.data.type is string
+        && (!('extraConfig' in request.resource.data) || !(request.resource.data.extraConfig.keys().hasAny(['password', 'token', 'accessToken', 'secret', 'apiKey', 'meshKey'])));
+      allow delete: if isOwner(uid);
+    }
+  }
+}

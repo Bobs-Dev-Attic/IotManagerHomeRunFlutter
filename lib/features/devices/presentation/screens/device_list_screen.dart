@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/models/device_model.dart';
-import '../../../auth/data/auth_repository.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/device_provider.dart';
 import '../widgets/device_card.dart';
 import 'add_device_screen.dart';
@@ -30,7 +30,7 @@ class DeviceListScreen extends ConsumerWidget {
             tooltip: 'Sign Out',
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              await AuthRepository().signOut();
+              await ref.read(authRepositoryProvider).signOut();
               if (context.mounted) {
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil('/', (_) => false);

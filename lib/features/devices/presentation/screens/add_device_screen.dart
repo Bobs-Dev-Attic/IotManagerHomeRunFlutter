@@ -24,6 +24,8 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   DeviceType _selectedType = DeviceType.smartPlug;
   bool _isSaving = false;
 
+  static final RegExp _ipv4Regex = RegExp(r'^(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}$');
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -77,6 +79,22 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
     }
   }
 
+
+  String? _validateIp(String? value) {
+    final v = value?.trim() ?? '';
+    final requiresIp = _selectedBrand == DeviceBrand.kasa || _selectedBrand == DeviceBrand.matter;
+    if (requiresIp && v.isEmpty) return 'IP address is required for this brand';
+    if (v.isNotEmpty && !_ipv4Regex.hasMatch(v)) return 'Enter a valid IPv4 address';
+    return null;
+  }
+
+  String? _validateMac(String? value) {
+    final v = value?.trim() ?? '';
+    if (v.isEmpty) return null;
+    final mac = RegExp(r'^[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}$');
+    if (!mac.hasMatch(v)) return 'Enter a valid MAC address';
+    return null;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,6 +170,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
                 prefixIcon: Icon(Icons.router),
               ),
               keyboardType: TextInputType.phone,
+              validator: _validateIp,
             ),
             const SizedBox(height: 16),
 
@@ -164,6 +183,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.memory),
               ),
+              validator: _validateMac,
             ),
             const SizedBox(height: 16),
 

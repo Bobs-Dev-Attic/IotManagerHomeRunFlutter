@@ -107,7 +107,7 @@ class DeviceModel {
       if (macAddress != null) 'macAddress': macAddress,
       if (model != null) 'model': model,
       if (firmwareVersion != null) 'firmwareVersion': firmwareVersion,
-      'extraConfig': extraConfig,
+      'extraConfig': _sanitizedExtraConfig(extraConfig),
       'isOnline': isOnline,
       'isPoweredOn': isPoweredOn,
       if (brightness != null) 'brightness': brightness,
@@ -187,4 +187,20 @@ class DeviceModel {
   @override
   String toString() =>
       'DeviceModel(id: $deviceId, name: $displayName, brand: ${brand.name})';
+
+  static const _sensitiveExtraConfigKeys = {
+    'password', 'token', 'accessToken', 'secret', 'apiKey', 'meshKey', 'authorization'
+  };
+
+  static Map<String, dynamic> _sanitizedExtraConfig(Map<String, dynamic> input) {
+    final output = <String, dynamic>{};
+    input.forEach((key, value) {
+      if (_sensitiveExtraConfigKeys.contains(key)) {
+        output[key] = 'secure://$key';
+      } else {
+        output[key] = value;
+      }
+    });
+    return output;
+  }
 }
