@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/developer_mode/presentation/screens/developer_mode_screen.dart';
+import 'features/devices/presentation/providers/device_provider.dart';
 import 'features/devices/presentation/screens/device_list_screen.dart';
 import 'firebase_options.dart';
 
@@ -20,11 +21,35 @@ Future<void> main() async {
   );
 }
 
-class IotManagerApp extends ConsumerWidget {
+class IotManagerApp extends ConsumerStatefulWidget {
   const IotManagerApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<IotManagerApp> createState() => _IotManagerAppState();
+}
+
+class _IotManagerAppState extends ConsumerState<IotManagerApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      ref.read(driverManagerProvider).disposeAll();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
     return MaterialApp(

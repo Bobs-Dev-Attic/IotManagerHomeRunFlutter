@@ -6,6 +6,7 @@ import '../../core/base/base_device_driver.dart';
 import '../../core/models/device_model.dart';
 import '../../core/models/driver_config.dart';
 import '../../core/utils/logger.dart';
+import '../../core/utils/resilience.dart';
 
 /// Leviton Cloud-Bridge driver.
 ///
@@ -22,6 +23,7 @@ class LevitonDriver extends BaseDeviceDriver {
   String? _accessToken;
   String? _residenceId;
   String? _activityId;
+  final CircuitBreaker _circuitBreaker = CircuitBreaker();
 
   LevitonDriver({Dio? dio}) {
     _dio = dio ??
@@ -165,10 +167,12 @@ class LevitonDriver extends BaseDeviceDriver {
 
   Future<void> _authenticate(String email, String password) async {
     try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        _loginEndpoint,
-        data: jsonEncode({'email': email, 'password': password}),
-      );
+      final response = await _circuitBreaker.run(() => retryWithBackoff(
+            task: () => _dio.post<Map<String, dynamic>>(
+              _loginEndpoint,
+              data: jsonEncode({'email': email, 'password': password}),
+            ),
+          ));
       final data = response.data;
       _accessToken = data?['id'] as String?;
 
@@ -196,9 +200,9 @@ class LevitonDriver extends BaseDeviceDriver {
     try {
       late Response<dynamic> response;
       if (method == 'GET') {
-        response = await _dio.get<dynamic>(path);
+        response = await _circuitBreaker.run(() => retryWithBackoff(task: () => _dio.get<dynamic>(path)));
       } else {
-        response = await _dio.put<dynamic>(path, data: body);
+        response = await _circuitBreaker.run(() => retryWithBackoff(task: () => _dio.put<dynamic>(path, data: body)));
       }
       return response.data as Map<String, dynamic>?;
     } on DioException catch (e) {

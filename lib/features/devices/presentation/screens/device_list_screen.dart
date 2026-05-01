@@ -30,6 +30,7 @@ class DeviceListScreen extends ConsumerWidget {
             tooltip: 'Sign Out',
             icon: const Icon(Icons.logout),
             onPressed: () async {
+              await ref.read(driverManagerProvider).disposeAll();
               await ref.read(authRepositoryProvider).signOut();
               if (context.mounted) {
                 Navigator.of(context)
