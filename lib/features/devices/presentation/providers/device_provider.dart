@@ -76,8 +76,11 @@ class DeviceStateNotifier extends StateNotifier<DeviceModel> {
   }
 
   Future<void> setBrightness(double brightness) async {
+    final previousBrightness = state.brightness;
     state = state.copyWith(brightness: brightness);
     _brightnessDebounce?.cancel();
+
+    final completer = Completer<void>();
     _brightnessDebounce = Timer(const Duration(milliseconds: 250), () async {
       try {
         await _manager.setBrightness(state.deviceId, brightness);
@@ -87,8 +90,14 @@ class DeviceStateNotifier extends StateNotifier<DeviceModel> {
           isPoweredOn: state.isPoweredOn,
           brightness: brightness,
         );
-      } catch (_) {}
+        if (!completer.isCompleted) completer.complete();
+      } catch (e, st) {
+        state = state.copyWith(brightness: previousBrightness);
+        if (!completer.isCompleted) completer.completeError(e, st);
+      }
     });
+
+    return completer.future;
   }
 
   @override

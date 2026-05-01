@@ -20,15 +20,15 @@
 - [x] Add lifecycle monitoring to ensure all sockets/HTTP clients are disposed on sign-out/app background.
 
 ## P3 — UX, Accessibility, and Product Quality
-- [ ] Add contextual error states with actionable remediation guidance (instead of raw exception text).
-- [ ] Provide onboarding for permission scopes (local network, account linking, privacy choices).
-- [ ] Add accessibility audit pass (screen-reader labels, contrast, focus order, dynamic text).
-- [ ] Add optimistic UI with rollback messaging for command failures.
+- [x] Add contextual error states with actionable remediation guidance (instead of raw exception text).
+- [x] Provide onboarding for permission scopes (local network, account linking, privacy choices).
+- [x] Add accessibility audit pass (screen-reader labels, contrast, focus order, dynamic text).
+- [x] Add optimistic UI with rollback messaging for command failures.
 
 ## P4 — Governance, Privacy, and Compliance
-- [ ] Add privacy documentation: data inventory, retention policy, deletion/export flows.
-- [ ] Minimize sensitive telemetry (IP/MAC/state history) and define retention windows.
-- [ ] Add secure SDLC checklist and threat modeling artifacts for each driver/protocol.
+- [x] Add privacy documentation: data inventory, retention policy, deletion/export flows.
+- [x] Minimize sensitive telemetry (IP/MAC/state history) and define retention windows.
+- [x] Add secure SDLC checklist and threat modeling artifacts for each driver/protocol.
 
 ## Validation Milestones
 - [ ] Firestore emulator tests for rule enforcement.

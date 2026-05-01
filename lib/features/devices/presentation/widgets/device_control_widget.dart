@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/models/device_model.dart';
 import '../providers/device_provider.dart';
+import '../../../../core/utils/user_facing_error.dart';
 
 /// A reusable widget that renders the appropriate controls (toggle switch,
 /// brightness slider) based on the device's type and capabilities.
@@ -30,10 +31,28 @@ class DeviceControlWidget extends ConsumerWidget {
             const Divider(),
 
             // Power toggle
-            SwitchListTile(
-              value: deviceState.isPoweredOn,
+            Semantics(
+              label: 'Power control for ${deviceState.displayName}',
+              toggled: deviceState.isPoweredOn,
+              child: SwitchListTile(
+                value: deviceState.isPoweredOn,
               onChanged: deviceState.isOnline
-                  ? (v) => notifier.toggle()
+                  ? (v) async {
+                      try {
+                        await notifier.toggle();
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Change reverted. ${remediationMessageForError(e)}'),
+                            action: SnackBarAction(
+                              label: 'Retry',
+                              onPressed: () => notifier.toggle(),
+                            ),
+                          ),
+                        );
+                      }
+                    }
                   : null,
               title: const Text('Power'),
               subtitle: Text(deviceState.isPoweredOn ? 'On' : 'Off'),
@@ -44,6 +63,7 @@ class DeviceControlWidget extends ConsumerWidget {
                 color: deviceState.isPoweredOn
                     ? theme.colorScheme.primary
                     : Colors.grey,
+              ),
               ),
             ),
 
@@ -62,7 +82,18 @@ class DeviceControlWidget extends ConsumerWidget {
                   label:
                       '${((deviceState.brightness ?? 1.0) * 100).round()}%',
                   onChanged: deviceState.isOnline && deviceState.isPoweredOn
-                      ? (v) => notifier.setBrightness(v)
+                      ? (v) async {
+                          try {
+                            await notifier.setBrightness(v);
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(remediationMessageForError(e)),
+                              ),
+                            );
+                          }
+                        }
                       : null,
                 ),
                 trailing: Text(
