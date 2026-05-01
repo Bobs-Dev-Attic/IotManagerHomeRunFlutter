@@ -1,0 +1,21 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_empty_else
+    - avoid_print
+    - avoid_redundant_argument_values
+    - avoid_relative_lib_imports
+    - avoid_returning_null_for_future
+    - avoid_type_to_string
+    - cancel_subscriptions
+    - close_sinks
+    - comment_references
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - unawaited_futures
+    - unnecessary_await_in_return
+    - use_rethrow_when_possible

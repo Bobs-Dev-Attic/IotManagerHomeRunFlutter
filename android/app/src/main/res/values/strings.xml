@@ -1,0 +1,5 @@
+<!-- Replace YOUR_WEB_CLIENT_ID with the OAuth 2.0 client ID from your Google Cloud Console.
+     This is required for Google Sign-In. -->
+<resources>
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
+</resources>

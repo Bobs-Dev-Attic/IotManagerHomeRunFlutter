@@ -1,0 +1,53 @@
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+pubspec.lock
+
+# Android
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/local.properties
+android/key.properties
+android/**/*.iml
+android/app/google-services.json
+
+# iOS
+ios/Flutter/
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/GoogleService-Info.plist
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# macOS
+macos/Flutter/ephemeral/
+
+# Web
+web/
+
+# Isar generated files
+**/*.isar
+
+# Coverage
+coverage/
+*.lcov
+
+# Firebase (contains secrets — never commit)
+lib/firebase_options.dart.bak
+google-services.json
+GoogleService-Info.plist
