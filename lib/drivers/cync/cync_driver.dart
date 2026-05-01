@@ -44,6 +44,9 @@ class CyncDriver extends BaseDeviceDriver {
   String get driverId => 'cync';
 
   @override
+  CyncDriver clone() => CyncDriver();
+
+  @override
   String get displayName => 'GE Cync (Cloud Bridge)';
 
   @override

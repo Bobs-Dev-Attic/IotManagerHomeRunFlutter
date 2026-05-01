@@ -30,6 +30,9 @@ class MatterDriver extends BaseDeviceDriver {
   String get driverId => 'matter';
 
   @override
+  MatterDriver clone() => MatterDriver();
+
+  @override
   String get displayName => 'Matter (Platform Channel)';
 
   @override

@@ -145,16 +145,10 @@ class DriverManager {
     }
   }
 
-  /// Creates a fresh driver instance from a prototype via the factory method.
-  ///
-  /// Each driver class must implement [createInstance] (or we simply call the
-  /// default constructor via the registered factory).  For now we keep a map
-  /// of factories registered alongside prototypes.
+  /// Creates a fresh driver instance by calling [BaseDeviceDriver.clone] on
+  /// the registered prototype.  This guarantees each device binding gets its
+  /// own isolated mutable state (sockets, auth tokens, etc.).
   BaseDeviceDriver _cloneDriver(BaseDeviceDriver prototype) {
-    // Drivers are expected to be stateless at construction time; a new call
-    // to initialize() sets up per-device state.  Re-using the prototype
-    // directly is safe here because each brand typically handles one device
-    // at a time.  For production use, replace with a factory map.
-    return prototype;
+    return prototype.clone();
   }
 }

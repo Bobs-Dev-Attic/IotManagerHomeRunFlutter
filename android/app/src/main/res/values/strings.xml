@@ -1,5 +1,8 @@
-<!-- Replace YOUR_WEB_CLIENT_ID with the OAuth 2.0 client ID from your Google Cloud Console.
-     This is required for Google Sign-In. -->
+<!-- ⚠  TEMPLATE FILE — DO NOT COMMIT REAL CREDENTIALS ⚠
+     Replace YOUR_WEB_CLIENT_ID with the OAuth 2.0 web client ID from your
+     Google Cloud Console once you have run `flutterfire configure`.
+     After filling in real values, ensure this file (or the generated
+     google-services.json) is excluded from version control. -->
 <resources>
     <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
 </resources>

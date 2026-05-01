@@ -40,6 +40,9 @@ class KasaDriver extends BaseDeviceDriver {
 
   bool _initialized = false;
 
+  @override
+  KasaDriver clone() => KasaDriver();
+
   // -----------------------------------------------------------------------
   // BaseDeviceDriver identity
   // -----------------------------------------------------------------------
@@ -117,11 +120,11 @@ class KasaDriver extends BaseDeviceDriver {
 
   @override
   Future<void> setColorTemperature(int kelvin) =>
-      throw UnsupportedError('KasaDriver does not support colour temperature.');
+      throw UnsupportedError('KasaDriver does not support color temperature.');
 
   @override
   Future<void> setColor(int r, int g, int b) =>
-      throw UnsupportedError('KasaDriver does not support RGB colour.');
+      throw UnsupportedError('KasaDriver does not support RGB color.');
 
   // -----------------------------------------------------------------------
   // Queries

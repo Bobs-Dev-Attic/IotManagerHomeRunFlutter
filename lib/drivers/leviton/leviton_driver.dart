@@ -42,6 +42,9 @@ class LevitonDriver extends BaseDeviceDriver {
   String get driverId => 'leviton';
 
   @override
+  LevitonDriver clone() => LevitonDriver();
+
+  @override
   String get displayName => 'Leviton Decora Smart (Cloud Bridge)';
 
   @override
@@ -125,11 +128,11 @@ class LevitonDriver extends BaseDeviceDriver {
   @override
   Future<void> setColorTemperature(int kelvin) =>
       throw UnsupportedError(
-          'LevitonDriver does not support colour temperature.');
+          'LevitonDriver does not support color temperature.');
 
   @override
   Future<void> setColor(int r, int g, int b) =>
-      throw UnsupportedError('LevitonDriver does not support RGB colour.');
+      throw UnsupportedError('LevitonDriver does not support RGB color.');
 
   // -----------------------------------------------------------------------
   // Queries

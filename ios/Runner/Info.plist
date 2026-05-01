@@ -56,7 +56,9 @@
 		<string>_matterc._tcp</string>
 		<string>_matter._tcp</string>
 	</array>
-	<!-- Google Sign-In URL scheme — replace with your reversed client ID -->
+	<!-- ⚠ TEMPLATE — replace YOUR_REVERSED_CLIENT_ID with the value from
+	     your GoogleService-Info.plist once you run `flutterfire configure`.
+	     Do not commit this file with real credentials. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

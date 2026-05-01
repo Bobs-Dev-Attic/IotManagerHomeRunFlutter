@@ -222,7 +222,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
       case DeviceType.dimmerSwitch:
         return 'Dimmer Switch';
       case DeviceType.colorBulb:
-        return 'Colour Bulb';
+        return 'Color Bulb';
       case DeviceType.sensor:
         return 'Sensor';
       case DeviceType.unknown:

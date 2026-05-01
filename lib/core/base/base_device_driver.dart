@@ -43,13 +43,13 @@ abstract class BaseDeviceDriver {
   /// Drivers that do not support dimming should throw [UnsupportedError].
   Future<void> setBrightness(double brightness);
 
-  /// Set the colour temperature in Kelvin (e.g. 2700 – 6500 K).
+  /// Set the color temperature in Kelvin (e.g. 2700 – 6500 K).
   ///
-  /// Drivers that do not support colour temperature should throw
+  /// Drivers that do not support color temperature should throw
   /// [UnsupportedError].
   Future<void> setColorTemperature(int kelvin);
 
-  /// Set an RGB colour where each component is in [0, 255].
+  /// Set an RGB color where each component is in [0, 255].
   ///
   /// Drivers that do not support RGB should throw [UnsupportedError].
   Future<void> setColor(int r, int g, int b);
@@ -68,6 +68,19 @@ abstract class BaseDeviceDriver {
   /// Returns a map of raw device info (firmware version, signal strength, …).
   /// The keys are driver-specific.
   Future<Map<String, dynamic>> getDeviceInfo();
+
+  // -----------------------------------------------------------------------
+  // Factory
+  // -----------------------------------------------------------------------
+
+  /// Create a new, uninitialised instance of this driver.
+  ///
+  /// [DriverManager] calls this method to obtain a fresh driver instance for
+  /// each device binding, ensuring that devices of the same brand never share
+  /// mutable driver state (open sockets, auth tokens, …).
+  ///
+  /// Every concrete driver **must** override this and return `DriverType()`.
+  BaseDeviceDriver clone();
 }
 
 // ---------------------------------------------------------------------------

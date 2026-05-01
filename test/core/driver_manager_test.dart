@@ -28,6 +28,9 @@ class _FakeDriver extends BaseDeviceDriver {
   List<DriverConfigField> get configSchema => const [];
 
   @override
+  _FakeDriver clone() => _FakeDriver(_id);
+
+  @override
   Future<void> initialize(DeviceModel device, Map<String, dynamic> config) async {
     _initialized = true;
   }
@@ -82,15 +85,11 @@ DeviceModel _makeDevice(DeviceBrand brand, String id) => DeviceModel(
 
 void main() {
   late DriverManager manager;
-  late _FakeDriver kasaDriver;
-  late _FakeDriver cyncDriver;
 
   setUp(() {
     manager = DriverManager();
-    kasaDriver = _FakeDriver('kasa');
-    cyncDriver = _FakeDriver('cync');
-    manager.registerDriver(kasaDriver);
-    manager.registerDriver(cyncDriver);
+    manager.registerDriver(_FakeDriver('kasa'));
+    manager.registerDriver(_FakeDriver('cync'));
   });
 
   group('DriverManager — registration', () {
@@ -148,20 +147,23 @@ void main() {
       await manager.bindDevice(kasaDevice);
     });
 
-    test('toggle routes to the correct driver', () async {
-      await manager.toggle('kasa-cmd', true);
-      expect(kasaDriver.lastToggleValue, isTrue);
-    });
-
-    test('setBrightness routes to the correct driver', () async {
-      await manager.setBrightness('kasa-cmd', 0.5);
-      expect(kasaDriver.lastBrightness, closeTo(0.5, 0.001));
-    });
-
-    test('getPowerStatus reflects last toggle', () async {
+    test('toggle on updates power status', () async {
       await manager.toggle('kasa-cmd', true);
       final status = await manager.getPowerStatus('kasa-cmd');
       expect(status, isTrue);
+    });
+
+    test('toggle off updates power status', () async {
+      await manager.toggle('kasa-cmd', true);
+      await manager.toggle('kasa-cmd', false);
+      final status = await manager.getPowerStatus('kasa-cmd');
+      expect(status, isFalse);
+    });
+
+    test('setBrightness is reflected by getBrightness', () async {
+      await manager.setBrightness('kasa-cmd', 0.5);
+      final brightness = await manager.getBrightness('kasa-cmd');
+      expect(brightness, closeTo(0.5, 0.001));
     });
 
     test('throws StateError if device is not bound', () {
@@ -169,6 +171,21 @@ void main() {
         () => manager.toggle('not-bound-id', true),
         throwsA(isA<StateError>()),
       );
+    });
+  });
+
+  group('DriverManager — driver isolation (clone)', () {
+    test('two devices of the same brand have independent state', () async {
+      final d1 = _makeDevice(DeviceBrand.kasa, 'kasa-a');
+      final d2 = _makeDevice(DeviceBrand.kasa, 'kasa-b');
+      await manager.bindDevice(d1);
+      await manager.bindDevice(d2);
+
+      await manager.toggle('kasa-a', true);
+      await manager.toggle('kasa-b', false);
+
+      expect(await manager.getPowerStatus('kasa-a'), isTrue);
+      expect(await manager.getPowerStatus('kasa-b'), isFalse);
     });
   });
 
