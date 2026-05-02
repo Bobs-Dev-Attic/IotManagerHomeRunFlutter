@@ -30,10 +30,22 @@ class DriverManager {
   // -----------------------------------------------------------------------
 
   /// Register a driver prototype.  Must be called before [bindDevice].
+  ///
+  /// The driver's [BaseDeviceDriver.sensitiveConfigKeys] are forwarded to
+  /// [DeviceModel.registerSensitiveExtraConfigKeys] so the Firestore
+  /// serializer redacts them automatically — third-party drivers therefore
+  /// inherit the sanitization policy without touching the model layer.
   void registerDriver(BaseDeviceDriver driver) {
     _driverPrototypes[driver.driverId] = driver;
+    if (driver.sensitiveConfigKeys.isNotEmpty) {
+      DeviceModel.registerSensitiveExtraConfigKeys(driver.sensitiveConfigKeys);
+    }
     AppLogger.info('DriverManager: registered driver "${driver.driverId}"');
   }
+
+  /// Lookup a registered driver prototype by its [BaseDeviceDriver.driverId].
+  BaseDeviceDriver? prototypeFor(String driverId) =>
+      _driverPrototypes[driverId];
 
   /// Returns all registered driver prototypes (useful for the Developer Mode
   /// driver picker UI).
@@ -49,13 +61,14 @@ class DriverManager {
   /// The brand of the device determines which registered driver prototype is
   /// used.  The driver is initialised with the device's [DeviceModel.extraConfig].
   Future<void> bindDevice(DeviceModel device) async {
-    final driverId = _driverIdForBrand(device.brand);
+    final driverId = _resolveDriverId(device);
     final prototype = _driverPrototypes[driverId];
 
     if (prototype == null) {
       throw DriverInitException(
         'No driver registered for brand "${device.brand.name}" '
-        '(expected driverId="$driverId").',
+        '(expected driverId="$driverId"). '
+        'Register the driver via DriverManager.registerDriver() at startup.',
       );
     }
 
@@ -133,8 +146,23 @@ class DriverManager {
 
   bool isBound(String deviceId) => _boundDrivers.containsKey(deviceId);
 
+  /// Returns the bound driver instance for [deviceId], or `null` if not bound.
+  /// Useful for capability checks and event-stream subscriptions in the UI.
+  BaseDeviceDriver? boundDriver(String deviceId) => _boundDrivers[deviceId];
+
+  /// Resolves the driver id for a device. Order of precedence:
+  /// 1. `extraConfig['_driverId']` — lets third-party drivers register a
+  ///    custom id without touching the [DeviceBrand] enum.
+  /// 2. The brand-enum mapping below (first-party drivers).
+  String _resolveDriverId(DeviceModel device) {
+    final override = device.extraConfig['_driverId'];
+    if (override is String && override.isNotEmpty) return override;
+    return _driverIdForBrand(device.brand);
+  }
+
   /// Maps a [DeviceBrand] to the canonical driver ID string used during
-  /// registration.
+  /// registration. Reserved for first-party drivers; new brands should use
+  /// the `extraConfig['_driverId']` override path so the enum stays small.
   static String _driverIdForBrand(DeviceBrand brand) {
     switch (brand) {
       case DeviceBrand.kasa:

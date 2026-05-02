@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import '../../core/base/base_device_driver.dart';
+import '../../core/base/device_capability.dart';
 import '../../core/models/device_model.dart';
 import '../../core/models/driver_config.dart';
 import '../../core/utils/logger.dart';
@@ -53,6 +54,16 @@ class KasaDriver extends BaseDeviceDriver {
 
   @override
   String get displayName => 'TP-Link Kasa (Local TCP)';
+
+  @override
+  String get manufacturer => 'TP-Link';
+
+  @override
+  Set<DeviceCapability> get capabilities => const {
+        DeviceCapability.power,
+        DeviceCapability.brightness,
+        DeviceCapability.energyMetering,
+      };
 
   @override
   List<DriverConfigField> get configSchema => [

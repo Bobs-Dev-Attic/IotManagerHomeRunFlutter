@@ -1,13 +1,21 @@
 import '../models/device_model.dart';
 import '../models/driver_config.dart';
+import 'device_capability.dart';
 
 /// Abstract base class that every device driver must implement.
 ///
 /// The Driver Framework routes all UI commands through [DriverManager],
 /// which resolves the correct [BaseDeviceDriver] instance for a given device
 /// and delegates the call here.
+///
+/// New drivers only need to implement the abstract members. The remaining
+/// hooks ([capabilities], [events], [healthCheck], [sensitiveConfigKeys],
+/// [discover], [version], [manufacturer]) have safe defaults so older drivers
+/// keep working unchanged while new drivers can opt into richer behaviour.
 abstract class BaseDeviceDriver {
   /// Unique brand/protocol identifier, e.g. "kasa", "cync", "leviton".
+  /// This string is also the lookup key in [DriverManager], so it must be
+  /// stable across releases.
   String get driverId;
 
   /// Human-readable name shown in the Developer Mode driver list.
@@ -17,6 +25,53 @@ abstract class BaseDeviceDriver {
   /// describes one input field that the user must fill in before the driver
   /// can be used (e.g. API tokens, mesh keys, IP ranges).
   List<DriverConfigField> get configSchema;
+
+  // -----------------------------------------------------------------------
+  // Driver metadata (optional, but recommended)
+  // -----------------------------------------------------------------------
+
+  /// Semantic version of the driver implementation. Used by future migration
+  /// logic and surfaced in Developer Mode for support diagnostics.
+  String get version => '1.0.0';
+
+  /// Display-only manufacturer / vendor string, e.g. "TP-Link", "GE".
+  String get manufacturer => '';
+
+  /// Capabilities advertised by this driver. The UI uses [supports] to decide
+  /// which controls to render (brightness slider, color picker, etc.) so
+  /// drivers should only include capabilities they can actually fulfil.
+  ///
+  /// Defaults to `{DeviceCapability.power}` for backward compatibility with
+  /// the original four drivers.
+  Set<DeviceCapability> get capabilities =>
+      const {DeviceCapability.power};
+
+  /// `extraConfig` keys that contain secrets and must never be persisted to
+  /// remote storage in cleartext. [DriverManager] forwards these to
+  /// [DeviceModel.registerSensitiveExtraConfigKeys] on registration so the
+  /// serializer redacts them automatically.
+  Set<String> get sensitiveConfigKeys => const {};
+
+  /// Returns `true` if this driver supports the given [capability].
+  bool supports(DeviceCapability capability) =>
+      capabilities.contains(capability);
+
+  /// Stream of unsolicited state-change events. Drivers that hold an open
+  /// connection (Matter subscriptions, websockets, MQTT) can publish here so
+  /// the UI does not have to poll. Default implementation is an empty stream.
+  Stream<DeviceStateEvent> get events => Stream<DeviceStateEvent>.empty();
+
+  /// Lightweight, side-effect-free probe used by background health monitors.
+  /// Override to return `false` (or throw) when the device is unreachable.
+  Future<bool> healthCheck() async => true;
+
+  /// Optional driver-specific discovery hook. Drivers that own a transport
+  /// (mDNS, BLE, vendor cloud listing) can surface candidate devices here so
+  /// the Add Device flow can suggest them. Default returns no hints.
+  Future<List<DiscoveryHint>> discover({
+    Duration timeout = const Duration(seconds: 5),
+  }) async =>
+      const [];
 
   // -----------------------------------------------------------------------
   // Lifecycle

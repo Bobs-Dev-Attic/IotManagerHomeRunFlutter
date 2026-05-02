@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../../core/base/base_device_driver.dart';
+import '../../core/base/device_capability.dart';
 import '../../core/models/device_model.dart';
 import '../../core/models/driver_config.dart';
 import '../../core/utils/logger.dart';
@@ -48,6 +49,18 @@ class LevitonDriver extends BaseDeviceDriver {
 
   @override
   String get displayName => 'Leviton Decora Smart (Cloud Bridge)';
+
+  @override
+  String get manufacturer => 'Leviton';
+
+  @override
+  Set<DeviceCapability> get capabilities => const {
+        DeviceCapability.power,
+        DeviceCapability.brightness,
+      };
+
+  @override
+  Set<String> get sensitiveConfigKeys => const {'password', 'accessToken'};
 
   @override
   List<DriverConfigField> get configSchema => [

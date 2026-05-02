@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../../core/base/base_device_driver.dart';
+import '../../core/base/device_capability.dart';
 import '../../core/models/device_model.dart';
 import '../../core/models/driver_config.dart';
 import '../../core/utils/logger.dart';
@@ -50,6 +51,21 @@ class CyncDriver extends BaseDeviceDriver {
 
   @override
   String get displayName => 'GE Cync (Cloud Bridge)';
+
+  @override
+  String get manufacturer => 'GE / Savant';
+
+  @override
+  Set<DeviceCapability> get capabilities => const {
+        DeviceCapability.power,
+        DeviceCapability.brightness,
+        DeviceCapability.colorTemperature,
+        DeviceCapability.color,
+      };
+
+  @override
+  Set<String> get sensitiveConfigKeys =>
+      const {'password', 'meshKey', 'accessToken'};
 
   @override
   List<DriverConfigField> get configSchema => [

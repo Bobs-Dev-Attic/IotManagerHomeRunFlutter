@@ -76,11 +76,35 @@ Every brand driver must extend this class and implement:
 - `bindDevice(device)` — resolves the correct driver by brand, initialises it, caches it by device ID
 - `toggle / setBrightness / …` — command methods that route to the bound driver
 
-### Adding a New Driver (Developer Mode)
+### Driver Metadata Hooks (optional)
+
+`BaseDeviceDriver` exposes the following extension points so the framework
+can grow to other devices without modifying core code:
+
+| Hook | Purpose | Default |
+|---|---|---|
+| `version` | Driver semantic version | `"1.0.0"` |
+| `manufacturer` | Display vendor name | `""` |
+| `capabilities` | `Set<DeviceCapability>` advertised to the UI | `{power}` |
+| `sensitiveConfigKeys` | Auto-redacted on Firestore writes | `{}` |
+| `events` | `Stream<DeviceStateEvent>` for push state | empty |
+| `healthCheck()` | Background reachability probe | returns `true` |
+| `discover()` | Driver-owned discovery (mDNS/BLE/cloud) | returns `[]` |
+
+### Adding a New Driver
 
 1. Create `lib/drivers/<brand>/<brand>_driver.dart` extending `BaseDeviceDriver`.
-2. Register it in `driverManagerProvider` inside `lib/features/devices/presentation/providers/device_provider.dart`.
-3. It will automatically appear in the **Developer Mode** screen where you can fill in its JSON config schema.
+2. Override the abstract members and any of the metadata hooks above that
+   apply.
+3. Register it in `driverManagerProvider` inside
+   `lib/features/devices/presentation/providers/device_provider.dart`.
+   The manager will automatically forward `sensitiveConfigKeys` to the
+   serializer's redaction set — no changes to `DeviceModel` required.
+4. To support a brand outside the `DeviceBrand` enum, store the driver id in
+   `device.extraConfig['_driverId']`; the manager prefers that override when
+   resolving the driver.
+5. The driver will appear in the **Developer Mode** screen with its JSON
+   config schema.
 
 ---
 
