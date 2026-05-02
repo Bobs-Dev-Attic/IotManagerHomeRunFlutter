@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 import '../../core/base/base_device_driver.dart';
+import '../../core/base/device_capability.dart';
 import '../../core/models/device_model.dart';
 import '../../core/models/driver_config.dart';
 import '../../core/utils/logger.dart';
@@ -34,6 +35,18 @@ class MatterDriver extends BaseDeviceDriver {
 
   @override
   String get displayName => 'Matter (Platform Channel)';
+
+  @override
+  String get manufacturer => 'Connectivity Standards Alliance';
+
+  @override
+  Set<DeviceCapability> get capabilities => const {
+        DeviceCapability.power,
+        DeviceCapability.brightness,
+        DeviceCapability.colorTemperature,
+        DeviceCapability.color,
+        DeviceCapability.eventStreaming,
+      };
 
   @override
   List<DriverConfigField> get configSchema => [

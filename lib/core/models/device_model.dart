@@ -188,11 +188,32 @@ class DeviceModel {
   String toString() =>
       'DeviceModel(id: $deviceId, name: $displayName, brand: ${brand.name})';
 
-  static const _sensitiveExtraConfigKeys = {
-    'password', 'token', 'accessToken', 'secret', 'apiKey', 'meshKey', 'authorization'
+  /// Default set of `extraConfig` keys that always represent secrets.
+  /// Drivers may extend this set via [registerSensitiveExtraConfigKeys] so
+  /// adding a new driver does not require modifying this file.
+  static final Set<String> _sensitiveExtraConfigKeys = {
+    'password',
+    'token',
+    'accessToken',
+    'secret',
+    'apiKey',
+    'meshKey',
+    'authorization',
   };
 
-  static Map<String, dynamic> _sanitizedExtraConfig(Map<String, dynamic> input) {
+  /// Registers additional sensitive config keys for serialization redaction.
+  /// Safe to call repeatedly; duplicates are ignored.
+  static void registerSensitiveExtraConfigKeys(Iterable<String> keys) {
+    _sensitiveExtraConfigKeys.addAll(keys);
+  }
+
+  /// Read-only view of the currently registered sensitive keys.
+  static Set<String> get sensitiveExtraConfigKeys =>
+      Set.unmodifiable(_sensitiveExtraConfigKeys);
+
+  static Map<String, dynamic> _sanitizedExtraConfig(
+    Map<String, dynamic> input,
+  ) {
     final output = <String, dynamic>{};
     input.forEach((key, value) {
       if (_sensitiveExtraConfigKeys.contains(key)) {
